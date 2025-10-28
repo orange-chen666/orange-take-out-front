@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import Layout from '@/views/layout/index.vue'
+
 </script>
 
 <template>
-  <Layout></Layout>
+  分类管理
 </template>
 
 <style scoped></style>
