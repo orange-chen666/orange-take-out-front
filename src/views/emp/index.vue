@@ -79,6 +79,9 @@ const handleSizeChange = (val: number) => {
 const goToAddEmployee = () =>{
   router.push('emp/add')//push跳转，注意各个路径别搞错了
 }
+const gotToEditEmp = () =>{
+  router.push('emp/edit')
+}
 
 const handleCurrentChange = (val: number) => {
   console.log(`current page: ${val}`)
@@ -110,7 +113,7 @@ const handleCurrentChange = (val: number) => {
     <el-table-column prop="updateTime" label="最后操作时间"  />
     <el-table-column prop="address" label="操作" width="300"> 
       <template #default="scope">
-        <el-button type="primary">修改</el-button>
+        <el-button type="primary" @click="gotToEditEmp">修改</el-button>
         <el-button type="success">启用</el-button>
         <el-button type="danger">删除</el-button>
       </template>
