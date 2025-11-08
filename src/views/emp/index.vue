@@ -1,8 +1,8 @@
 <script setup lang="ts">
 //格式化有问题
 import { reactive, ref, onMounted } from 'vue'
-import type { ComponentSize } from 'element-plus'
-import { queryemp } from '@/api/emp'
+import { ElMessage, type ComponentSize } from 'element-plus'
+import { deleteById, queryemp } from '@/api/emp'
 import router from '@/router';
 
 // import axios from 'axios'
@@ -39,6 +39,7 @@ const search = async () => {
       }
     );
     console.log('API Response:', result);
+    console.log('emplist数组', ref)
     if (result.code) {
       emplist.value = result.data.records
       total.value = result.data.total
@@ -76,13 +77,31 @@ const handleSizeChange = (val: number) => {
 }
 //添加员工
 //跟视图有关的的涉及router
-const goToAddEmployee = () =>{
+const goToAddEmployee = () => {
   router.push('emp/add')//push跳转，注意各个路径别搞错了
 }
-const gotToEditEmp = () =>{
-  router.push('emp/edit')
-}
 
+// 编辑员工
+const gotToEditEmp = (row: any) => {
+  router.push({
+    path: 'emp/add',
+    query: {
+      id: row.id
+    }
+  })
+}
+//删除员工
+const delet = async (row: any) => {
+  try {
+    const result: any = await deleteById(row)
+    if (result.code) {
+      console.log('删除成功!')
+      ElMessage.success('删除成功')
+    }
+  } catch (error) {
+    ElMessage.error('删除失败')
+  }
+}
 const handleCurrentChange = (val: number) => {
   console.log(`current page: ${val}`)
   currentPage.value = val
@@ -95,45 +114,39 @@ const handleCurrentChange = (val: number) => {
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="员工姓名">
         <el-input v-model="formInline.user" placeholder="请输入员工姓名" clearable />
-     </el-form-item>
-     <el-form-item>
-      <el-button type="primary" @click="search">搜索</el-button>
-    </el-form-item>
-    <el-form-item>
-      <el-button type="primary" @click="goToAddEmployee">添加员工</el-button>
-    </el-form-item>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="search">搜索</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="goToAddEmployee">添加员工</el-button>
+      </el-form-item>
     </el-form>
   </div>
+  <!-- scope 是 Element Plus 表格插槽传递的对象，它包含了当前行的所有信息
+scope.row 就是当前行对应的实际数据对象，也就是 emplist 数组中的一个元素 -->
   <div>
-    <el-table :data="emplist" border style="width: 100%">
-    <el-table-column prop="name" label="员工姓名" width="150" />
-    <el-table-column prop="username" label="账号" width="150" />
-    <el-table-column prop="phone" label="手机号" width="180" />
-    <el-table-column prop="status" label="账号状态" width="100" />
-    <el-table-column prop="updateTime" label="最后操作时间"  />
-    <el-table-column prop="address" label="操作" width="300"> 
-      <template #default="scope">
-        <el-button type="primary" @click="gotToEditEmp">修改</el-button>
-        <el-button type="success">启用</el-button>
-        <el-button type="danger">删除</el-button>
-      </template>
+    <el-table :data="emplist" :border="true" style="width: 100%">
+      <el-table-column prop="name" label="员工姓名" width="150" />
+      <el-table-column prop="username" label="账号" width="150" />
+      <el-table-column prop="phone" label="手机号" width="180" />
+      <el-table-column prop="status" label="账号状态" width="100" />
+      <el-table-column prop="updateTime" label="最后操作时间" />
+      <el-table-column prop="id" label="操作" width="300">
+        <template #default="scope">
+          <el-button type="primary" @click="gotToEditEmp(scope.row)">修改</el-button>
+          <el-button type="success" @="">启用</el-button>
+          <el-button type="danger" @="">删除</el-button>//
+          <!-- handleDelete(scope.row) -->
+        </template>
 
-    </el-table-column>
+      </el-table-column>
     </el-table>
   </div>
   <div>
-    <el-pagination
-      v-model:current-page="currentPage"
-      v-model:page-size="pageSize"
-      :page-sizes="[5, 10, 15, 20]"
-      :size="size"
-      :disabled="disabled"
-      :background="background"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="total"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-    />
+    <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[5, 10, 15, 20]"
+      :size="size" :disabled="disabled" :background="background" layout="total, sizes, prev, pager, next, jumper"
+      :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
 
   </div>
 </template>

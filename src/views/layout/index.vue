@@ -112,7 +112,7 @@ const logOut = () => {
                   </el-icon>订单管理
                 </template>
               </el-menu-item>
-              <el-menu-item index="/order">
+              <el-menu-item index="/setmeal">
                 <template #title>
                   <el-icon>
                     <message />

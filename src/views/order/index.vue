@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  分类管理
+  订单管理
 </template>
 
 <style scoped></style>

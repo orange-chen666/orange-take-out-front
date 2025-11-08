@@ -77,7 +77,7 @@ const tableData: User[] = [
   <div class="table">
     <el-table :data="tableData" style="width: 100%">
     <el-table-column type="selection" width="55" />
-    <el-table-column label="图片" width="120">
+    <el-table-column label="菜品名称" width="120">
       <template #default="scope">{{ scope.row.date }}</template>
     </el-table-column>
     <el-table-column property="name" label="菜品分类" width="120" />

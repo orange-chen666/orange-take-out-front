@@ -7,6 +7,7 @@ import LoginView from '@/views/login/index.vue'
 import DishView from '@/views/dish/index.vue'
 import EmpView from '@/views/emp/index.vue'
 import AddempView from '@/views/emp/addemp.vue'
+import EetmealView from '@/views/setmeal/index.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   //嵌套路由，解决登录界面嵌入式主界面
@@ -42,6 +43,16 @@ const router = createRouter({
           path: 'emp/add',
           name: 'emp-add',
           component: AddempView
+        },
+        {
+          path: 'emp/edit',
+          name: 'emp-edit',
+          component: AddempView
+        },
+        {
+          path: 'setmeal',
+          name: 'setmeal',
+          component: EetmealView
         }
 
       ]

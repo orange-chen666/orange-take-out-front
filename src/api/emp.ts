@@ -6,6 +6,7 @@ export const queryemp = (params?: { page?: number,pageSize?: number,name?: strin
   request.get('/admin/emp/page',{params})//这里边简写了{}和return
 //添加员工
 export interface empData {
+  id: bigint
   idNumber: string
   name: string
   phone: string
@@ -32,3 +33,10 @@ export interface loginData {
 }
 export const login = (data: loginData) =>
   request.post('/admin/emp/login',data)
+
+// 根据ID获取员工信息
+export const getempById = (id: bigint) => 
+  request.get(`/admin/emp/${id}`)
+//删除query参数是啥？这个没弄成可选的没问题吧
+export const deleteById = (params:{id: bigint}) =>
+  request.delete('/admin/delete',{params})
