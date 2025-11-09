@@ -21,7 +21,7 @@ const empDataRef = ref<FormInstance>()
 const empForm = reactive<empData>({
   //其实有无Partial或者id有没有值也没事，因为后端添加在mapper层没有用的id,
   //但是编辑一定要把id: 0n顶掉不然胡乱编辑了
-  id: 0n,
+  id: '',
   idNumber: '',
   name: '',
   phone: '',
@@ -30,7 +30,7 @@ const empForm = reactive<empData>({
 })
 // 判断是否为编辑模式
 const isEditMode = ref(false)
-const currentEmpId = ref<bigint>(0n)//(null)设置初值
+const currentEmpId = ref<string>('')//(null)设置初值
 //rules好像是定规则
 const rules = reactive<FormRules<empData>>({
   username: [
@@ -64,7 +64,7 @@ onMounted(async () => {
     // 确保我们处理的是字符串而不是数组
     const id = Array.isArray(route.query.id) ? route.query.id[0] : route.query.id;
     if (id) {
-      currentEmpId.value = BigInt(id);
+      currentEmpId.value = id;
     }
     try {
       // 获取员工详细信息
@@ -111,7 +111,7 @@ const saveEmp = async (formEl: FormInstance | undefined) => {
       let result: any
       if (isEditMode.value) {
         //编辑功能       
-        if (currentEmpId.value !== 0n) {//绝对要不能为0除非后端自己设置为0，哪怕主键只增id也是从1开始
+        if (currentEmpId.value !== '') {//绝对要不能为0除非后端自己设置为0，哪怕主键只增id也是从1开始
           result = await editemp({ ...empForm, id: currentEmpId.value })
         }
         if (result.code) {
@@ -145,7 +145,6 @@ const onSubmit1 = async () => {
 </script>
 <!-- 注意：在 <el-form-item> 中，prop 属性的值应该对应 rules 对象中的键名 -->
 <template>
-  添加员工
   <el-form ref="empDataRef" style="max-width: 400px" :model="empForm" :rules="rules" label-width="auto">
     <el-form-item label="账号" prop="username">
       <el-input v-model="empForm.username" />

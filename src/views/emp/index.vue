@@ -2,7 +2,7 @@
 //格式化有问题
 import { reactive, ref, onMounted } from 'vue'
 import { ElMessage, type ComponentSize } from 'element-plus'
-import { deleteById, queryemp } from '@/api/emp'
+import { deleteById, queryemp, startOrStop } from '@/api/emp'
 import router from '@/router';
 
 // import axios from 'axios'
@@ -91,17 +91,24 @@ const gotToEditEmp = (row: any) => {
   })
 }
 //删除员工
-const delet = async (row: any) => {
+const delemp = async (row: any) => {
   try {
-    const result: any = await deleteById(row)
+    // const result: any = await deleteById(row.id)，(row.id)典型错误这是js
+    const result: any = await deleteById({ id: row.id })
     if (result.code) {
-      console.log('删除成功!')
       ElMessage.success('删除成功')
+      search()
     }
   } catch (error) {
     ElMessage.error('删除失败')
   }
 }
+//修改员工状态
+// const status = async (row: any) => {
+
+//   const result = await startOrStop()
+// }
+
 const handleCurrentChange = (val: number) => {
   console.log(`current page: ${val}`)
   currentPage.value = val
@@ -135,8 +142,8 @@ scope.row 就是当前行对应的实际数据对象，也就是 emplist 数组�
       <el-table-column prop="id" label="操作" width="300">
         <template #default="scope">
           <el-button type="primary" @click="gotToEditEmp(scope.row)">修改</el-button>
-          <el-button type="success" @="">启用</el-button>
-          <el-button type="danger" @="">删除</el-button>//
+          <el-button type="success" >启用</el-button>
+          <el-button type="danger" @click="delemp(scope.row)">删除</el-button>
           <!-- handleDelete(scope.row) -->
         </template>
 
