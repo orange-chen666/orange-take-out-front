@@ -35,7 +35,7 @@ const search = async () => {
       {
         page: currentPage.value,
         pageSize: pageSize.value,
-        name: formInline.user || undefined
+        name: formInline.name || undefined
       }
     );
     console.log('API Response:', result);
@@ -53,7 +53,7 @@ const search = async () => {
   // 其他功能仍然可以正常使用。
 }
 const formInline = reactive({
-  user: '',
+  name: '',
   region: '',
   date: '',
 })
@@ -70,11 +70,7 @@ const pageSize = ref(10)
 const size = ref<ComponentSize>('default')
 const disabled = ref(false)
 const background = ref(false)
-const handleSizeChange = (val: number) => {
-  console.log(`${val} items per page`)
-  pageSize.value = val
-  search()//重新获取
-}
+
 //添加员工
 //跟视图有关的的涉及router
 const goToAddEmployee = () => {
@@ -104,11 +100,24 @@ const delemp = async (row: any) => {
   }
 }
 //修改员工状态
-// const status = async (row: any) => {
-
-//   const result = await startOrStop()
-// }
-
+const setStatus = async (row: any) => {
+  const newsatus = row.status === 1 ? '0' : '1'
+  console.log(newsatus, '新状态')
+  const result: any = await startOrStop(newsatus, row.id)
+  try {
+    if (result.code == 1) {
+      ElMessage.success('修改员工状态成功')
+      search()
+    }
+  } catch (error) {
+    ElMessage.error('修改员工状态失败')
+  }
+}
+const handleSizeChange = (val: number) => {
+  console.log(`${val} items per page`)
+  pageSize.value = val
+  search()//重新获取
+}
 const handleCurrentChange = (val: number) => {
   console.log(`current page: ${val}`)
   currentPage.value = val
@@ -120,7 +129,7 @@ const handleCurrentChange = (val: number) => {
   <div>
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="员工姓名">
-        <el-input v-model="formInline.user" placeholder="请输入员工姓名" clearable />
+        <el-input v-model="formInline.name" placeholder="请输入员工姓名" clearable />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="search">搜索</el-button>
@@ -132,17 +141,30 @@ const handleCurrentChange = (val: number) => {
   </div>
   <!-- scope 是 Element Plus 表格插槽传递的对象，它包含了当前行的所有信息
 scope.row 就是当前行对应的实际数据对象，也就是 emplist 数组中的一个元素 -->
+  <!--{{ }} 是Vue的插值语法 双花括号表示其中的内容是JavaScript表达式，会被Vue解析并渲染成相应的值 -->
+  <!-- 这里 #default="scope" 表示我们正在定义 el-table-column 组件的默认插槽内容，并通过 scope 
+ 变量接收该组件传递的数据（比如当前行的数据）。scope.row 就是当前行的数据对象。 -->
+  <!-- 语法规则：在 Vue 中，当我们要为组件的插槽提供复杂内容（不仅仅是纯文本）时，
+  必须使用 <template> 标签配合 v-slot 指令。
+区分插槽内容和组件属性：如果直接写在 <el-table-column> 上，Vue 无法区分哪些是组件的属性，哪些是要插入插槽的内容。
+支持多个元素：使用 <template> 可以在插槽中放置多个元素，而不仅仅是一个。-->
+  <!-- 当前行数据：scope.row 包含了表格中当前这一行的所有数据字段 在 scope.row 中，
+   row 是 Element Plus 表格组件传递给插槽的一个属性，代表当前行的数据对象。 -->
   <div>
     <el-table :data="emplist" :border="true" style="width: 100%">
       <el-table-column prop="name" label="员工姓名" width="150" />
       <el-table-column prop="username" label="账号" width="150" />
       <el-table-column prop="phone" label="手机号" width="180" />
-      <el-table-column prop="status" label="账号状态" width="100" />
+      <el-table-column prop="status" label="账号状态" width="100">
+        <template #default="scope">
+          <span>{{ scope.row.status === 1 ? '启用' : '禁用' }}</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="updateTime" label="最后操作时间" />
       <el-table-column prop="id" label="操作" width="300">
         <template #default="scope">
           <el-button type="primary" @click="gotToEditEmp(scope.row)">修改</el-button>
-          <el-button type="success" >启用</el-button>
+          <el-button type="success" @click="setStatus(scope.row)">{{ scope.row.status === 1 ? '禁用' : '启用' }}</el-button>
           <el-button type="danger" @click="delemp(scope.row)">删除</el-button>
           <!-- handleDelete(scope.row) -->
         </template>
@@ -150,6 +172,7 @@ scope.row 就是当前行对应的实际数据对象，也就是 emplist 数组�
       </el-table-column>
     </el-table>
   </div>
+  <!-- 分页功能 -->
   <div>
     <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[5, 10, 15, 20]"
       :size="size" :disabled="disabled" :background="background" layout="total, sizes, prev, pager, next, jumper"

@@ -21,6 +21,7 @@ const form = reactive<emppwd>({
   oldPassword: ''
 })
 //退出登录
+//并且删除本地token
 const logOut = () => {
   localStorage.removeItem('loginUser')
   router.push('/login')
